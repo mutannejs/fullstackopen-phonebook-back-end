@@ -52,6 +52,14 @@ app.get('/api/info', (req, resp) => {
   return resp.send(bodyResp);
 });
 
+app.delete('/api/persons/:id', (req, resp) => {
+  const id = Number(req.params.id);
+  const personToRemoveIndex = persons.findIndex(person => person.id === id);
+  persons.splice(personToRemoveIndex, 1);
+
+  return resp.status(204).end();
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 });
