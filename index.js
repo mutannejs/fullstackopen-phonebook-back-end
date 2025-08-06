@@ -1,6 +1,7 @@
 import express from 'express';
 
 const PORT = 3001;
+const MAX_RANDOM_NUMBER = 999999;
 
 const persons = [
   { 
@@ -50,6 +51,38 @@ app.get('/api/info', (req, resp) => {
   `;
 
   return resp.send(bodyResp);
+});
+
+app.post('/api/persons', (req, resp) => {
+  const person = req.body;
+
+  if (!person.name) {
+    return resp.status(400).json({
+      error: "name is required"
+    });
+  }
+
+  if (!person.number) {
+    return resp.status(400).json({
+      error: "number is required"
+    });
+  }
+
+  if (persons.some((p) => p.name === person.name)) {
+    return resp.status(400).json({
+      error: "name must be unique"
+    });
+  }
+
+  const newId = Math.ceil(Math.random() * MAX_RANDOM_NUMBER);
+  const newPerson = {
+    id: newId,
+    ...person,
+  };
+
+  persons.push(newPerson);
+
+  return resp.json(newPerson);
 });
 
 app.delete('/api/persons/:id', (req, resp) => {
