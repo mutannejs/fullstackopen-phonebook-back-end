@@ -1,4 +1,5 @@
 import express from 'express';
+import morgan from 'morgan';
 
 const PORT = 3001;
 const MAX_RANDOM_NUMBER = 999999;
@@ -28,6 +29,7 @@ const persons = [
 
 const app = express();
 app.use(express.json());
+app.use(morgan('tiny'));
 
 app.get('/api/persons', (req, resp) => {
   return resp.json(persons);
