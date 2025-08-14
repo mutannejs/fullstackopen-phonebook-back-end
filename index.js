@@ -83,21 +83,15 @@ app.post('/api/persons', (req, resp) => {
     });
   }
 
-  if (persons.some((p) => p.name === person.name)) {
-    return resp.status(400).json({
-      error: "name must be unique"
-    });
-  }
-
   const newId = Math.ceil(Math.random() * MAX_RANDOM_NUMBER);
-  const newPerson = {
+  const newPerson = new Person({
     id: newId,
     ...person,
-  };
+  });
 
-  persons.push(newPerson);
-
-  return resp.json(newPerson);
+  newPerson.save().then(
+    response => resp.json(response)
+  );
 });
 
 app.delete('/api/persons/:id', (req, resp) => {
