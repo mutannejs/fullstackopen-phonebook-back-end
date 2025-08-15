@@ -2,7 +2,6 @@ import 'dotenv/config';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-
 import { Person } from './models/person.js';
 
 const PORT = process.env.PORT || 3001;
@@ -37,15 +36,15 @@ morgan.token('body', function getBody (req, res) {
 
 const app = express();
 
-app.use(cors());
 app.use(express.static("build"));
+app.use(cors());
 app.use(express.json());
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
-app.get('/api/persons', (req, resp) => {
-  Person.find({}).then(
-    response => resp.json(response)
-  );
+app.get('/api/persons', (req, resp, next) => {
+  Person.find({})
+    .then(response => resp.json(response))
+    .catch(error => next(error));
 });
 
 app.get('/api/persons/:id', (req, resp) => {
@@ -68,7 +67,7 @@ app.get('/api/info', (req, resp) => {
   return resp.send(bodyResp);
 });
 
-app.post('/api/persons', (req, resp) => {
+app.post('/api/persons', (req, resp, next) => {
   const person = req.body;
 
   if (!person.name) {
@@ -89,17 +88,17 @@ app.post('/api/persons', (req, resp) => {
     ...person,
   });
 
-  newPerson.save().then(
-    response => resp.json(response)
-  );
+  newPerson.save()
+    .then(response => resp.json(response))
+    .catch((error) => next(error));
 });
 
-app.delete('/api/persons/:id', (req, resp) => {
-  const id = Number(req.params.id);
-  const personToRemoveIndex = persons.findIndex(person => person.id === id);
-  persons.splice(personToRemoveIndex, 1);
+app.delete('/api/persons/:id', (req, resp, next) => {
+  const id = req.params.id;
 
-  return resp.status(204).end();
+  Person.findByIdAndDelete(id)
+    .then(() => resp.status(204).end())
+    .catch((error) => next(error));
 });
 
 app.listen(PORT, () => {
