@@ -47,24 +47,24 @@ app.get('/api/persons', (req, resp, next) => {
     .catch(error => next(error));
 });
 
-app.get('/api/persons/:id', (req, resp) => {
-  const id = Number(req.params.id);
-  const person = persons.find(person => person.id === id);
+app.get('/api/persons/:id', (req, resp, next) => {
+  const id = req.params.id;
 
-  if (!person) {
-    return resp.status(404).end();
-  } else {
-    return resp.json(person);
-  }
+  Person.findById(id)
+    .then((response) => resp.json(response))
+    .catch((error) => next(error));
 });
 
-app.get('/api/info', (req, resp) => {
-  const bodyResp = `
-    <p>persons has info for ${persons.length} people</p>
-    <p>${(new Date())}</p>
-  `;
-
-  return resp.send(bodyResp);
+app.get('/api/info', (req, resp, next) => {
+  Person.find({})
+    .then((response) => {
+      const bodyResp = `
+        <p>persons has info for ${response.length} people</p>
+        <p>${(new Date())}</p>
+      `;
+      return resp.send(bodyResp);
+    })
+    .catch((error) => next(error));
 });
 
 app.post('/api/persons', (req, resp, next) => {
