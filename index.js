@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import { Person } from './models/person.js';
 
 const PORT = process.env.PORT || 3001;
-const MAX_RANDOM_NUMBER = 999999;
 
 // const persons = [
 //   { 
@@ -68,28 +67,15 @@ app.get('/api/info', (req, resp, next) => {
 });
 
 app.post('/api/persons', (req, resp, next) => {
-  const person = req.body;
+  const { name, number } = req.body;
 
-  if (!person.name) {
-    return resp.status(400).json({
-      error: "name is required"
-    });
-  }
-
-  if (!person.number) {
-    return resp.status(400).json({
-      error: "number is required"
-    });
-  }
-
-  const newId = Math.ceil(Math.random() * MAX_RANDOM_NUMBER);
   const newPerson = new Person({
-    id: newId,
-    ...person,
+    name,
+    number,
   });
 
   newPerson.save()
-    .then(response => resp.json(response))
+    .then((response) => resp.json(response))
     .catch((error) => next(error));
 });
 
@@ -111,9 +97,10 @@ app.put('/api/persons/:id', (req, resp, next) => {
   };
 
   Person.findByIdAndUpdate(
-      id,
-      updatedPerson,
-      { new: true })
+    id,
+    updatedPerson,
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then((response) => resp.json(response))
     .catch((error) => next(error));
 });
@@ -121,3 +108,23 @@ app.put('/api/persons/:id', (req, resp, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 });
+
+const unknownEndpoint = (req, resp, next) => {
+  return resp.status(404).send({ error: "unknown endpoint" });
+}
+
+app.use(unknownEndpoint);
+
+const errorHandler = (error, req, resp, next) => {
+  console.log(error.message);
+
+  if (error.name === "CastError") {
+    return resp.status(404).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return resp.status(400).send({ error: error.message });
+  }
+
+  next(error);
+}
+
+app.use(errorHandler);
