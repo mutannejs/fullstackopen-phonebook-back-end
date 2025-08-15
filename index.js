@@ -7,30 +7,30 @@ import { Person } from './models/person.js';
 const PORT = process.env.PORT || 3001;
 
 // const persons = [
-//   { 
+//   {
 //     "id": 1,
-//     "name": "Arto Hellas", 
+//     "name": "Arto Hellas",
 //     "number": "040-123456"
 //   },
-//   { 
+//   {
 //     "id": 2,
-//     "name": "Ada Lovelace", 
+//     "name": "Ada Lovelace",
 //     "number": "39-44-5323523"
 //   },
-//   { 
+//   {
 //     "id": 3,
-//     "name": "Dan Abramov", 
+//     "name": "Dan Abramov",
 //     "number": "12-43-234345"
 //   },
-//   { 
+//   {
 //     "id": 4,
-//     "name": "Mary Poppendieck", 
+//     "name": "Mary Poppendieck",
 //     "number": "39-23-6423122"
 //   }
 // ]
 
-morgan.token('body', function getBody (req, res) {
-  return JSON.stringify(req.body)
+morgan.token('body', function getBody (req) {
+  return JSON.stringify(req.body);
 });
 
 const app = express();
@@ -106,14 +106,16 @@ app.put('/api/persons/:id', (req, resp, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log(`Server running on port ${PORT}`);
 });
 
-const unknownEndpoint = (req, resp, next) => {
+const unknownEndpoint = (req, resp) => {
   return resp.status(404).send({ error: "unknown endpoint" });
-}
+};
 
 app.use(unknownEndpoint);
+
+console.log("TESTE");
 
 const errorHandler = (error, req, resp, next) => {
   console.log(error.message);
@@ -125,6 +127,6 @@ const errorHandler = (error, req, resp, next) => {
   }
 
   next(error);
-}
+};
 
 app.use(errorHandler);

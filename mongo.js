@@ -18,11 +18,11 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model("Person", personSchema);
 
-if (process.argv.length != 5) {
+if (process.argv.length !== 5) {
   Person.find({}).then(response => {
     response.forEach(
       (person) => console.log(`${person.name} ${person.number}`)
-    )
+    );
     mongoose.connection.close();
   });
 } else {
