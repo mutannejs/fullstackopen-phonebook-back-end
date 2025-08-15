@@ -101,6 +101,23 @@ app.delete('/api/persons/:id', (req, resp, next) => {
     .catch((error) => next(error));
 });
 
+app.put('/api/persons/:id', (req, resp, next) => {
+  const id = req.params.id;
+  const { name, number } = req.body;
+
+  const updatedPerson = {
+    name: name,
+    number: number,
+  };
+
+  Person.findByIdAndUpdate(
+      id,
+      updatedPerson,
+      { new: true })
+    .then((response) => resp.json(response))
+    .catch((error) => next(error));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 });
